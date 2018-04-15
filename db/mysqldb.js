@@ -17,13 +17,18 @@ mysqldb.query = function(sql, callback){
         callback();
         return;
     }
-    pool.query(sql, function(err, rows, fields) {
-        if (err) {
-            callback(err, null);
-            return;
-        };
-        callback(null, rows, fields);
-    });
+    try {
+        pool.query(sql, function(err, rows, fields) {
+            if (err) {
+                callback(err, null);
+                return;
+            };
+            callback(null, rows, fields);
+        });
+    } catch (err) {
+        console.log(err)
+    }
+
 };
 
 //---------------------------------------------model接口实现----------------------------------------------------------
@@ -255,8 +260,15 @@ mysqldb.changeDate = function (param, callback){
 
 }
 
-mysqldb.getArticleDetail = function (param, callback){
-    var sql = "select * from article where id = " +  param.id;
+mysqldb.getArticleDetail = function (id, callback){
+    var sql = "select * from article where id = " +  id;
+    this.query(sql, function(err, rows){
+        callback(err,rows)
+    });
+}
+
+mysqldb.like = function (id, callback){
+    var sql = "update article set likeNum = likeNum + 1 where id = " +  id;
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -499,12 +511,12 @@ mysqldb.queryAllUserInfo = function(replyItem,callback) {
 
 }
 
-mysqldb.queryUserComment = function queryUserComment(reply_id,topic_id,type,callBack){
+mysqldb.queryUserComment = function queryUserComment(param,callBack){
     var data={}
     var _this = this
     var sqls = [
-        "select * from comments where type= '"+type+"' and reply_id = "+reply_id+ " and topic_id = " +topic_id +" order by cTime desc",
-        "select count(id) as total from comments where type= '"+type+"' and reply_id = "+reply_id+ " and  topic_id = " +topic_id
+        "select * from comments where  reply_id = "+param.reply_id+ " and topic_id = " +param.topic_id +" order by cTime desc",
+        "select count(id) as total from comments where  reply_id = "+param.reply_id+ " and  topic_id = " +param.topic_id
     ];
     async.parallel([
             function(callback){

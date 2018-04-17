@@ -10,6 +10,16 @@ var async = require('async');
 var db = require('../db/mysqldb');
 
 router.post('/addOrUpdateArticle', function(req, res) {
+    var user = req.session.user;
+    var community = req.body.community?parseInt(req.body.community):0;
+    if (!user || !user.id) {
+        utilFn.successSend(res,null,500,'没有登入');
+        return;
+    }
+    if (community === 1 && req.session.user.username !== "tanliangbang") {
+        utilFn.successSend(res,null,500,'用户没有权限');
+        return;
+    }
     var param = {
         id:req.body.id,
         title: req.body.title,
@@ -21,10 +31,10 @@ router.post('/addOrUpdateArticle', function(req, res) {
         typeName: req.body.typeName,
         content: req.body.content,
         label: req.body.label?req.body.label:'',
-        auth: req.session.user.id,
+        auth: user.id,
         contentId:req.body.contentId,
         oldTypeId:req.body.oldTypeId,
-        is_community:req.body.community?req.body.community:0
+        is_community:community
     }
     db.addOrUpdateArticleContent(param, function(err, rows) {
         if (err) {

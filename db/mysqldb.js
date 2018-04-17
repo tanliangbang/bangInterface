@@ -57,7 +57,6 @@ mysqldb.getPlateDetailById = function(id, callback) {
 
 mysqldb.delPlate = function(id, callback) {
     var sql = "delete from plate where id ="+ id;
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -82,7 +81,6 @@ mysqldb.addOrUpdateArticle = function(param, callback) {
             param.title+"','"+param.breif+"','"+param.wherefrom+"',"+ param.content+","+ param.auth+","+ param.is_show+","+
             param.typeId+",'"+ param.label+"','"+ param.imgUrl+"',"+param.is_community+",'"+ param.typeName+"',now())";
     }
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -112,7 +110,6 @@ mysqldb.getReArticleListByType = function(param, callback) {
     }
     var sql = "select art.*, user.username, user.nick, user.userAavar, user.job from article as art left join " +
         "bang_users user on art.auth = user.id " + str
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -143,7 +140,9 @@ mysqldb.getArticleListByTypeCount = function(param, callback) {
 }
 
 mysqldb.getArticlById = function(id, callback) {
-    var sql = "select * from article where id = "+ id;
+    var sql = "select art.*, user.username, user.nick, user.userAavar, user.job from article as art left join " +
+        "bang_users user on art.auth = user.id  where art.id = " + id
+    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -190,11 +189,12 @@ mysqldb.changeTypeNum = function(param,callback) {
         callback()
         return;
     }
+    console.log(param['is_community'])
     this.query(sql, function(err, rows){
         async.parallel([
                 function(callback){
                     var contentObj = JSON.parse(rows[0].content);
-                    if(param.community===1){
+                    if(param['is_community']===1){
                         num = parseInt(contentObj.sys_community_num)+1
                         contentObj.sys_community_num = num
                     } else{
@@ -212,7 +212,7 @@ mysqldb.changeTypeNum = function(param,callback) {
                         var oldSql = "select * from res_content_article_type where id = "+ param.oldTypeId;
                         _this.query(oldSql, function(err, rows){
                             var contentObj = JSON.parse(rows[0].content);
-                            if(param.community===1){
+                            if(param['is_community']===1){
                                 num = parseInt(contentObj.sys_community_num)-1
                                 contentObj.sys_community_num = num
                             }else {
@@ -364,7 +364,6 @@ mysqldb.addResContent = function(param, callback) {
     var sql =  "insert into "+param.tableName+" (content,startTime,endTime,isOnline,createTime,modifiedTime," +
         "readyNum,from_uid) values ("+ param.parseContent+","+param.startTime+","+param.endTime+","+ param.onLine+
         ",now(),now(),0,"+param.from_uid+")";
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -393,7 +392,6 @@ mysqldb.updateResContent = function(param, callback) {
     var sql =  "update "+param.tableName+" set content= "+ param.parseContent+",startTime="+
         "from_unixtime('"+param.startTime+"'),endTime=" + "from_unixtime('"+ param.endTime+"'),isOnline="
         +param.onLine+",modifiedTime=now() where id = "+param.resContentId;
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });

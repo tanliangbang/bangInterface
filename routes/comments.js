@@ -11,13 +11,17 @@ var url = require('url');
 var async = require('async');
 
 router.post('/comment', function(req, res, next) {
+    var from_id = 0;
+    if (req.session.user && req.session.user.id) {
+        from_id =req.session.user.id;
+    }
     var param = {
         topic_id: utilFn.checkNumber(req.body.topic_id),
         content: utilFn.checkEmpty(req.body.content),
         reply_id: utilFn.checkNumber(req.body.reply_id),
-        from_uid: req.session.user.id,
+        from_uid: from_id,
         to_uid: utilFn.checkNumber(req.body.to_uid),
-        type: utilFn.checkNumber(req.body.type)
+        type: utilFn.checkNumber(req.body.type),
     }
     db.comment(param, function(err, rows){
         if (err) {

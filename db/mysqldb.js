@@ -104,6 +104,15 @@ mysqldb.getReArticleListByType = function(param, callback) {
     if (param.recommend) {
         str += " and art.is_recommend = " + param.recommend
     }
+
+    if (param.top) {
+        str += " and art.is_top = " + param.top
+    }
+
+    if (param.show) {
+        str += " and art.is_show = " + param.show
+    }
+
     str += ' order by art.createTime desc '
     if(param.start && param.pageSize){
         str += ' limit '+param.start+','+param.pageSize
@@ -133,7 +142,17 @@ mysqldb.getArticleListByTypeCount = function(param, callback) {
         str += " and is_recommend = " + param.recommend
     }
 
+    if (param.top) {
+        str += " and is_top = " + param.top
+    }
+
+    if (param.show) {
+        str += " and is_show = " + param.show
+    }
+
+
     var sql = "select count(id) as total from article" + str
+    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });

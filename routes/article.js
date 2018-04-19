@@ -70,7 +70,9 @@ router.get('/getArticleListByType', function(req, res) {
         typeId:arg.typeId,
         community:arg.community,
         good:arg.good,
-        recommend:arg.recommend
+        show:arg.show,
+        recommend:arg.recommend,
+        top:arg.top
     }
     var content ={};
     var pageTotal = 0;

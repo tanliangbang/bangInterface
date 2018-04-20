@@ -531,10 +531,18 @@ mysqldb.queryAllUserInfo = function(replyItem,callback) {
 mysqldb.queryUserComment = function queryUserComment(param,callBack){
     var data={}
     var _this = this
+    var str = "where 1=1 "
+    if (param.reply_id) {
+        str += " and reply_id = " + param.reply_id
+    }
+    if (param.topic_id) {
+        str += " and topic_id = " + param.topic_id
+    }
     var sqls = [
-        "select * from comments where  reply_id = "+param.reply_id+ " and topic_id = " +param.topic_id +" order by cTime desc",
-        "select count(id) as total from comments where  reply_id = "+param.reply_id+ " and  topic_id = " +param.topic_id
+        "select * from comments " + str +" order by cTime desc",
+        "select count(id) as total from comments " + str
     ];
+    console.log(sqls)
     async.parallel([
             function(callback){
                 _this.query(sqls[0], function(err, rows, fields){
@@ -560,6 +568,28 @@ mysqldb.queryUserComment = function queryUserComment(param,callBack){
         function(err){
             callBack(data)
         });
+}
+
+mysqldb.getAllCommentList = function queryUserComment(param,callback){
+    var str = " where 1=1 ";
+    str += ' order by cTime desc '
+    if(param.start && param.pageSize){
+        str += ' limit '+param.start+','+param.pageSize
+    }
+    var sql = "select cmt.id,cmt.content,user.username from comments as cmt left join bang_users as user on user.id = cmt.from_uid" + str;
+    this.query(sql, function(err, rows){
+        callback(rows)
+    });
+}
+
+
+mysqldb.delComment = function(id, callback) {
+    var sql = "delete from comments where id ="+ id;
+    var sqlReply = "delete from comments where to_uid = " +id
+    console.log(sql)
+    this.query(sql, function(err, rows){
+        callback(err,rows)
+    });
 }
 
 //----------------------------------------------评论结束-----------------------------------------------------------------

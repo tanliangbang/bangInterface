@@ -36,8 +36,8 @@ router.post('/comment', function(req, res, next) {
 router.get('/commentList', function(req, res, next) {
     var arg = url.parse(req.url, true).query
     var param = {
-        start: arg.start?arg.start:0,
-        end: arg.size?arg.size:10,
+        start: arg.start,
+        end:arg.size,
         topic_id: arg.topic_id,
         reply_id: 0
     }
@@ -68,6 +68,26 @@ router.get('/commentList', function(req, res, next) {
     })
 
 });
+
+router.get('/allCommentList', function(req, res, next) {
+    var arg = url.parse(req.url, true).query
+    var param = {
+        start: arg.start,
+        pageSize:arg.pageSize
+    }
+    db.getAllCommentList(param,function(data){
+        utilFn.successSend(res,data);
+    });
+});
+
+router.post('/delComment', function(req, res, next) {
+    db.delComment(req.body.id,function(data){
+        utilFn.successSend(res);
+    });
+});
+
+
+
 
 function queryAllReply(list,topic_id,callback){
     async.map(list, function(item, callback) {

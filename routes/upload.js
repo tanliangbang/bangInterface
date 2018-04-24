@@ -25,6 +25,9 @@ router.post('/uploadImg', function(req, res, next) {
 
 //上传完成后处理
     form.parse(req, function(err, fields, files) {
+        if(!files){
+            return;
+        }
          localFile = files["resImg"][0]["path"];
         if(err){
             console.log('parse error: ' + err);

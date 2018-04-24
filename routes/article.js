@@ -26,6 +26,7 @@ router.post('/addOrUpdateArticle', function(req, res) {
         breif: req.body.breif,
         wherefrom: req.body.wherefrom?req.body.wherefrom:'',
         imgUrl: req.body.imgUrl?req.body.imgUrl:'',
+        seo_keys:req.body.seo_keys?req.body.seo_keys:'',
         is_show: req.body.is_show?req.body.is_show: 1,
         typeId: req.body.typeId,
         typeName: req.body.typeName,

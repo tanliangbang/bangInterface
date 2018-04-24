@@ -75,11 +75,11 @@ mysqldb.addOrUpdateArticle = function(param, callback) {
     if(param.id) {
         sql = "update article set title = '" + param.title +"',breif='"+param.breif+"',wherefrom='"+param.wherefrom+
             "',content="+param.content+",is_show="+param.is_show+",typeId="+param.typeId+
-            ",label='"+param.label+"',imgUrl='"+param.imgUrl+"',is_community="+param.is_community+",typeName='"+param.typeName+"',modifiedTime = now() where id = "+ param.id
+            ",label='"+param.label+"',imgUrl='"+param.imgUrl+"',is_community="+param.is_community+",seo_keys='"+param.seo_keys+"',typeName='"+param.typeName+"',modifiedTime = now() where id = "+ param.id
     }else {
-        sql =  "insert into article (title,breif,wherefrom,content,auth,is_show,typeId,label,imgUrl,is_community,typeName,createTime) values ('"+
+        sql =  "insert into article (title,breif,wherefrom,content,auth,is_show,typeId,label,imgUrl,seo_keys,is_community,typeName,createTime) values ('"+
             param.title+"','"+param.breif+"','"+param.wherefrom+"',"+ param.content+","+ param.auth+","+ param.is_show+","+
-            param.typeId+",'"+ param.label+"','"+ param.imgUrl+"',"+param.is_community+",'"+ param.typeName+"',now())";
+            param.typeId+",'"+ param.label+"','"+ param.imgUrl+"','"+ param.seo_keys+"',"+param.is_community+",'"+ param.typeName+"',now())";
     }
     this.query(sql, function(err, rows){
         callback(err,rows)
@@ -152,7 +152,6 @@ mysqldb.getArticleListByTypeCount = function(param, callback) {
 
 
     var sql = "select count(id) as total from article" + str
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -161,7 +160,6 @@ mysqldb.getArticleListByTypeCount = function(param, callback) {
 mysqldb.getArticlById = function(id, callback) {
     var sql = "select art.*, user.username, user.nick, user.userAavar, user.job from article as art left join " +
         "bang_users user on art.auth = user.id  where art.id = " + id
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
@@ -208,7 +206,6 @@ mysqldb.changeTypeNum = function(param,callback) {
         callback()
         return;
     }
-    console.log(param['is_community'])
     this.query(sql, function(err, rows){
         async.parallel([
                 function(callback){
@@ -390,8 +387,8 @@ mysqldb.addResContent = function(param, callback) {
 
 mysqldb.addOrUpdateArticleContent = function(param, callback) {
     var sql = "";
-    if(param.id){
-         sql = "update res_content set content = '"+param.content+"' where id = "+ param.id;
+    if(param.contentId){
+         sql = "update res_content set content = '"+param.content+"' where id = "+ param.contentId;
     }else{
          sql = "insert into res_content (content) values ('"+param.content+"')";
     }
@@ -542,7 +539,6 @@ mysqldb.queryUserComment = function queryUserComment(param,callBack){
         "select * from comments " + str +" order by cTime desc",
         "select count(id) as total from comments " + str
     ];
-    console.log(sqls)
     async.parallel([
             function(callback){
                 _this.query(sqls[0], function(err, rows, fields){
@@ -586,7 +582,6 @@ mysqldb.getAllCommentList = function queryUserComment(param,callback){
 mysqldb.delComment = function(id, callback) {
     var sql = "delete from comments where id ="+ id;
     var sqlReply = "delete from comments where to_uid = " +id
-    console.log(sql)
     this.query(sql, function(err, rows){
         callback(err,rows)
     });
